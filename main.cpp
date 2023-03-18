@@ -25,6 +25,8 @@
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 #include <signal.h>
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <signal.h>
 #endif
 
 #define ANSI_COLOR_RED "\x1b[31m"
@@ -837,7 +839,8 @@ bool llama_eval(const llama_model &model, const int n_threads, const int n_past,
 
 static bool is_interacting = false;
 
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__)) ||          \
+    defined(_WIN32)
 void sigint_handler(int signo) {
   if (signo == SIGINT) {
     if (!is_interacting) {
