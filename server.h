@@ -1,9 +1,12 @@
 #pragma once
 #include "WinSock2.h"
+#include <WS2tcpip.h>
+#include <Windows.h>
 #include <iostream>
 #include <mutex>
 #include <queue>
 #include <string>
+#include <thread>
 
 template <typename T> class ThreadSafeQueue {
   public:

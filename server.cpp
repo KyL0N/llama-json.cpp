@@ -1,6 +1,6 @@
 #include "server.h"
 
-void handle_connection(SOCKET clientSocket, ThreadSafeQueue<std::string> messageQueue)
+void handle_connection(SOCKET clientSocket, ThreadSafeQueue<std::string>& messageQueue)
 {
     char buffer[1024];
     int  recvResult;
@@ -63,6 +63,7 @@ std::vector<std::thread> init_server(ThreadSafeQueue<std::string>& messageQueue,
     }
 
     SOCKET clientSocket;
+    printf("Waiting for client to connect 127.0.0.1:1145 ...");
     // block until a client connects
     clientSocket = accept(listenSocket, nullptr, nullptr);
 

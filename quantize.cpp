@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 
-
 // TODO: move somewhere else
 #define QK 32
 
