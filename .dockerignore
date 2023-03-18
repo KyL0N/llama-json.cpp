@@ -1,13 +1,9 @@
 *.o
 *.a
-*.exe
-prompt.txt
-run.sh
 .cache/
 .vs/
 .vscode/
 .DS_Store
-.clang-format
 
 build/
 build-em/
@@ -22,10 +18,7 @@ models/*
 
 /main
 /quantize
-/result
 
 arm_neon.h
 compile_commands.json
-
-.envrc
-.direnv/
+Dockerfile
