@@ -10,6 +10,9 @@
 #    include <unistd.h>
 
 #    define SOCKET int
+#    define INVALID_SOCKET -1
+#    define SOCKET_ERROR -1
+
 #endif
 
 ThreadSafeQueue<std::string>      messageQueue;
@@ -52,7 +55,7 @@ void handle_connection(SOCKET clientSocket)
         recvResult = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (recvResult == SOCKET_ERROR) {
             fprintf(stderr, "recv message failed\n");
-            closesocket(clientSocket);
+            socketClose(clientSocket);
             return;
         }
 
@@ -63,7 +66,7 @@ void handle_connection(SOCKET clientSocket)
 
     } while (recvResult > 0);
 
-    closesocket(clientSocket);
+    socketClose(clientSocket);
 }
 
 std::vector<std::thread> init_server()
@@ -136,7 +139,9 @@ std::vector<std::thread> init_server()
             // Send the response back to the client
             int sendResult = send(clientSocket, responseStr.c_str(), responseStr.size(), 0);
             if (sendResult == SOCKET_ERROR) {
-                std::cerr << "\nsend failed with error: " << WSAGetLastError() << std::endl;
+                fprintf(stderr, "send message failed\n");
+                socketClose(clientSocket);
+                return;
             }
         }
     });
