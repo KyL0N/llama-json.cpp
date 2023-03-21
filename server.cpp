@@ -3,7 +3,7 @@
 #if defined(_WIN32)
 #    include "WinSock2.h"
 #    include <WS2tcpip.h>
-#elif defined(__unix__)
+#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 #    include <arpa/inet.h>
 #    include <netdb.h>
 #    include <sys/socket.h>
