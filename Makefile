@@ -10,6 +10,10 @@ ifndef UNAME_M
 UNAME_M := $(shell uname -m)
 endif
 
+ifndef OS
+OS := $(shell uname -o)
+endif
+
 CCV := $(shell $(CC) --version | head -n 1)
 CXXV := $(shell $(CXX) --version | head -n 1)
 
@@ -32,10 +36,12 @@ endif
 
 CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++17 -fPIC
-LDFLAGS  = -lws2_32
+LDFLAGS  =
 
 # OS specific
-# TODO: support Windows
+ifeq ($(OS),Windows_NT)
+	LDFLAGS  += -lws2_32
+endif
 ifeq ($(UNAME_S),Linux)
 	CFLAGS   += -pthread
 	CXXFLAGS += -pthread
@@ -169,6 +175,7 @@ $(info I llama.cpp build info: )
 $(info I UNAME_S:  $(UNAME_S))
 $(info I UNAME_P:  $(UNAME_P))
 $(info I UNAME_M:  $(UNAME_M))
+$(info I OS:       $(OS))
 $(info I CFLAGS:   $(CFLAGS))
 $(info I CXXFLAGS: $(CXXFLAGS))
 $(info I LDFLAGS:  $(LDFLAGS))
