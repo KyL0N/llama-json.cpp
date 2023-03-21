@@ -149,7 +149,7 @@ std::vector<std::thread> init_server()
 
 void deinit_server(std::vector<std::thread>& threads)
 {
-    WSACleanup();
+    socketClose(listenSocket);
     for (auto& thread : threads) {
         thread.join();
     }
