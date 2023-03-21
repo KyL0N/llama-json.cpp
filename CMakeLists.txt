@@ -211,4 +211,5 @@ target_link_libraries(llama PRIVATE ggml utils)
 # if windows, link ws2_32
 if (WIN32)
     target_link_libraries(llama PRIVATE ws2_32)
+endif()
 target_link_libraries(quantize PRIVATE ggml utils)
