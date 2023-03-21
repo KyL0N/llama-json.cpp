@@ -1,12 +1,49 @@
 #include "server.h"
-#include "WinSock2.h"
-#include <WS2tcpip.h>
-#include <Windows.h>
+#include <stdio.h>
+#include <winsock2.h>
+
+#if defined(_WIN32)
+#    include "WinSock2.h"
+#    include <WS2tcpip.h>
+#elif defined(__unix__)
+#    include <arpa/inet.h>
+#    include <netdb.h>
+#    include <sys/socket.h>
+#    include <unistd.h>
+
+#    define SOCKET int
+#endif
 
 ThreadSafeQueue<std::string>      messageQueue;
 ThreadSafeQueue<std::vector<int>> responseQueue;
 SOCKET                            listenSocket;
 SOCKET                            clientSocket;
+
+int socketClose(SOCKET socket)
+{
+#if defined(_WIN32)
+    return closesocket(socket);
+#elif defined(__unix__)
+    return close(socket);
+#endif
+}
+
+int socketInit()
+{
+#if defined(_WIN32)
+    WSADATA wsaData;
+    return WSAStartup(MAKEWORD(2, 2), &wsaData);
+#elif defined(__unix__)
+    return 0;
+#endif
+}
+
+void socketCleanup()
+{
+#if defined(_WIN32)
+    WSACleanup();
+#endif
+}
 
 void handle_connection(SOCKET clientSocket)
 {
@@ -16,12 +53,11 @@ void handle_connection(SOCKET clientSocket)
         // Receive data from the client
         recvResult = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (recvResult == SOCKET_ERROR) {
-            std::cerr << "recv failed with error: " << WSAGetLastError() << std::endl;
+            fprintf(stderr, "recv message failed\n");
             closesocket(clientSocket);
             return;
         }
-        // if (recvResult > 0) {
-        // Process the received data
+
         std::string message(buffer, recvResult);
 
         // Push the message onto the queue
@@ -34,18 +70,18 @@ void handle_connection(SOCKET clientSocket)
 
 std::vector<std::thread> init_server()
 {
-    WSADATA wsaData;
-    int     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    int iResult;
+    iResult = socketInit();
     if (iResult != 0) {
-        std::cerr << "WSAStartup failed with error: " << iResult << std::endl;
+        fprintf(stderr, "socketInit failed\n");
         return {};
     }
 
     // Create a socket to listen for incoming connections
     listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenSocket == INVALID_SOCKET) {
-        std::cerr << "socket failed with error: " << WSAGetLastError() << std::endl;
-        WSACleanup();
+        fprintf(stderr, "listenSocket is invalid\n");
+        socketCleanup();
         return {};
     }
 
@@ -56,28 +92,27 @@ std::vector<std::thread> init_server()
     localAddr.sin_port        = htons(1145);  // Replace with desired port number
     iResult                   = bind(listenSocket, reinterpret_cast<sockaddr*>(&localAddr), sizeof(localAddr));
     if (iResult == SOCKET_ERROR) {
-        std::cerr << "bind failed with error: " << WSAGetLastError() << std::endl;
-        closesocket(listenSocket);
-        WSACleanup();
+        fprintf(stderr, "bind port %d failed\n", ntohs(localAddr.sin_port));
+        socketClose(listenSocket);
+        socketCleanup();
         return {};
     }
 
     // Set the socket to listen for incoming connections
     if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR) {
-        std::cerr << "listen failed with error: " << WSAGetLastError() << std::endl;
-        closesocket(listenSocket);
-        WSACleanup();
+        fprintf(stderr, "listen on port %d failed\n", ntohs(localAddr.sin_port));
+        socketClose(listenSocket);
+        socketCleanup();
         return {};
     }
 
-    printf("Waiting for client to connect 127.0.0.1:1145 ...\n");
+    printf("Waiting for client to connect 127.0.0.1:%d\n", ntohs(localAddr.sin_port));
     // block until a client connects
     clientSocket = accept(listenSocket, nullptr, nullptr);
     std::thread acceptThread([&]() {
         if (clientSocket == INVALID_SOCKET) {
-            std::cerr << "accept failed with error: " << WSAGetLastError() << std::endl;
-            closesocket(listenSocket);
-            WSACleanup();
+            fprintf(stderr, "accept socket failed\n");
+            socketClose(listenSocket);
             return;
         }
 
