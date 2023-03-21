@@ -1,4 +1,7 @@
 #include "server.h"
+#include "WinSock2.h"
+#include <WS2tcpip.h>
+#include <Windows.h>
 
 ThreadSafeQueue<std::string>      messageQueue;
 ThreadSafeQueue<std::vector<int>> responseQueue;

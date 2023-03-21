@@ -1,8 +1,4 @@
 #pragma once
-// #if defined(_WIN32)
-#include "WinSock2.h"
-#include <WS2tcpip.h>
-#include <Windows.h>
 
 #include <iostream>
 #include <mutex>
