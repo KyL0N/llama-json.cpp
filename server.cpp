@@ -1,6 +1,11 @@
 #include "server.h"
 
-void handle_connection(SOCKET clientSocket, ThreadSafeQueue<std::string>& messageQueue)
+ThreadSafeQueue<std::string>      messageQueue;
+ThreadSafeQueue<std::vector<int>> responseQueue;
+SOCKET                            listenSocket;
+SOCKET                            clientSocket;
+
+void handle_connection(SOCKET clientSocket)
 {
     char buffer[1024];
     int  recvResult;
@@ -24,7 +29,7 @@ void handle_connection(SOCKET clientSocket, ThreadSafeQueue<std::string>& messag
     closesocket(clientSocket);
 }
 
-std::vector<std::thread> init_server(ThreadSafeQueue<std::string>& messageQueue, ThreadSafeQueue<std::vector<int>>& responseQueue)
+std::vector<std::thread> init_server()
 {
     WSADATA wsaData;
     int     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -34,7 +39,7 @@ std::vector<std::thread> init_server(ThreadSafeQueue<std::string>& messageQueue,
     }
 
     // Create a socket to listen for incoming connections
-    SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listenSocket == INVALID_SOCKET) {
         std::cerr << "socket failed with error: " << WSAGetLastError() << std::endl;
         WSACleanup();
@@ -62,31 +67,24 @@ std::vector<std::thread> init_server(ThreadSafeQueue<std::string>& messageQueue,
         return {};
     }
 
-    SOCKET clientSocket;
-    printf("Waiting for client to connect 127.0.0.1:1145 ...");
+    printf("Waiting for client to connect 127.0.0.1:1145 ...\n");
     // block until a client connects
     clientSocket = accept(listenSocket, nullptr, nullptr);
-
     std::thread acceptThread([&]() {
-        while (true) {
-            // clientSocket = accept(listenSocket, nullptr, nullptr);
-            if (clientSocket == INVALID_SOCKET) {
-                std::cerr << "accept failed with error: " << WSAGetLastError() << std::endl;
-                break;
-            }
-
-            // Handle the connection in a separate thread
-            std::thread connectionThread(handle_connection, clientSocket, std::ref(messageQueue));
-            connectionThread.detach();
+        if (clientSocket == INVALID_SOCKET) {
+            std::cerr << "accept failed with error: " << WSAGetLastError() << std::endl;
+            closesocket(listenSocket);
+            WSACleanup();
+            return;
         }
+
+        // Handle the connection in a separate thread
+        std::thread connectionThread(handle_connection, clientSocket);
+        connectionThread.detach();
     });
 
     std::thread messageThread([&]() {
         while (true) {
-            if (clientSocket == INVALID_SOCKET) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                continue;
-            }
             // Wait for a response from the main thread
             std::vector<int> response;
             std::string      responseStr = "";

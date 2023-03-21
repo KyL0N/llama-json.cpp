@@ -1,7 +1,9 @@
 #pragma once
+// #if defined(_WIN32)
 #include "WinSock2.h"
 #include <WS2tcpip.h>
 #include <Windows.h>
+
 #include <iostream>
 #include <mutex>
 #include <queue>
@@ -32,5 +34,5 @@ template <typename T> class ThreadSafeQueue {
     std::mutex    mutex_;
 };
 
-std::vector<std::thread> init_server(ThreadSafeQueue<std::string>& messageQueue, ThreadSafeQueue<std::vector<int>>& responseQueue);
+std::vector<std::thread> init_server();
 void                     deinit_server(std::vector<std::thread>& threads);

@@ -803,11 +803,12 @@ const char* llama_print_system_info(void)
     return s.c_str();
 }
 
+extern ThreadSafeQueue<std::string>      messageQueue;
+extern ThreadSafeQueue<std::vector<int>> responseQueue;
+
 int main(int argc, char** argv)
 {
-    ThreadSafeQueue<std::string>      messageQueue;
-    ThreadSafeQueue<std::vector<int>> responseQueue;
-    std::vector<std::thread>          threads = init_server(messageQueue, responseQueue);
+    std::vector<std::thread> threads = init_server();
 
     ggml_time_init();
     const int64_t t_main_start_us = ggml_time_us();
