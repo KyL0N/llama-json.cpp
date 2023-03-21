@@ -1,6 +1,4 @@
 #include "server.h"
-#include <stdio.h>
-#include <winsock2.h>
 
 #if defined(_WIN32)
 #    include "WinSock2.h"
