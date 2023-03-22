@@ -9521,8 +9521,7 @@ void ggml_graph_dump_dot(const struct ggml_cgraph* gb, const struct ggml_cgraph*
 {
     char color[16];
 
-    FILE* fp;
-    fopen_s(&fp, filename, "w");
+    FILE* fp = fopen(filename, "w");
     GGML_ASSERT(fp);
 
     fprintf(fp, "digraph G {\n");
