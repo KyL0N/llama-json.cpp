@@ -631,6 +631,13 @@ struct ggml_opt_params ggml_opt_default_params(enum ggml_opt_type type);
 enum ggml_opt_result ggml_opt(struct ggml_context* ctx, struct ggml_opt_params params, struct ggml_tensor* f);
 
 //
+// quantization
+//
+
+size_t ggml_quantize_q4_0(float * src, void * dst, int n, int k, int qk, int64_t * hist);
+size_t ggml_quantize_q4_1(float * src, void * dst, int n, int k, int qk, int64_t * hist);
+
+//
 // system info
 //
 

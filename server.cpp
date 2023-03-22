@@ -1,9 +1,9 @@
 #include "server.h"
 
-ThreadSafeQueue<std::string>      messageQueue;
-ThreadSafeQueue<std::vector<int>> responseQueue;
-SOCKET                            listenSocket;
-SOCKET                            clientSocket;
+ThreadSafeQueue<std::string> messageQueue;
+ThreadSafeQueue<std::string> responseQueue;
+SOCKET                       listenSocket;
+SOCKET                       clientSocket;
 
 int socketClose(SOCKET socket)
 {
@@ -110,19 +110,19 @@ std::vector<std::thread> init_server()
     std::thread messageThread([&]() {
         while (true) {
             // Wait for a response from the main thread
-            std::vector<int> response;
-            std::string      responseStr = "";
+            std::string response;
+            // std::string responseStr = "";
 
             while (!responseQueue.tryPop(response)) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
 
             // to string
-            for (int i = 0; i < response.size(); i++) {
-                responseStr += std::to_string(response[i]) + ",";
-            }
+            // for (int i = 0; i < response.size(); i++) {
+            //     responseStr += std::to_string(response[i]) + ",";
+            // }
             // Send the response back to the client
-            int sendResult = send(clientSocket, responseStr.c_str(), responseStr.size(), 0);
+            int sendResult = send(clientSocket, response.c_str(), response.length(), 0);
             if (sendResult == SOCKET_ERROR) {
                 fprintf(stderr, "send message failed\n");
                 socketClose(clientSocket);
