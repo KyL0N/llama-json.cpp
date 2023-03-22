@@ -1,20 +1,5 @@
 #include "server.h"
 
-#if defined(_WIN32)
-#    include "WinSock2.h"
-#    include <WS2tcpip.h>
-#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-#    include <arpa/inet.h>
-#    include <netdb.h>
-#    include <sys/socket.h>
-#    include <unistd.h>
-
-#    define SOCKET int
-#    define INVALID_SOCKET -1
-#    define SOCKET_ERROR -1
-
-#endif
-
 ThreadSafeQueue<std::string>      messageQueue;
 ThreadSafeQueue<std::vector<int>> responseQueue;
 SOCKET                            listenSocket;
@@ -24,7 +9,7 @@ int socketClose(SOCKET socket)
 {
 #if defined(_WIN32)
     return closesocket(socket);
-#elif defined(__unix__)
+#else
     return close(socket);
 #endif
 }
@@ -34,7 +19,7 @@ int socketInit()
 #if defined(_WIN32)
     WSADATA wsaData;
     return WSAStartup(MAKEWORD(2, 2), &wsaData);
-#elif defined(__unix__)
+#else
     return 0;
 #endif
 }

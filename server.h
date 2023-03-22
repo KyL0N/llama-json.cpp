@@ -6,6 +6,21 @@
 #include <string>
 #include <thread>
 
+#if defined(_WIN32)
+#    define NOMINMAX
+#    include "WinSock2.h"
+#    include <WS2tcpip.h>
+#elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#    include <arpa/inet.h>
+#    include <netdb.h>
+#    include <sys/socket.h>
+#    include <unistd.h>
+
+#    define SOCKET int
+#    define INVALID_SOCKET -1
+#    define SOCKET_ERROR -1
+#endif
+
 template <typename T> class ThreadSafeQueue {
   public:
     void push(const T& value)

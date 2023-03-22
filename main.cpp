@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
@@ -592,11 +593,14 @@ bool llama_eval(const llama_model&                model,
         // fprintf(stderr, "\n%s: reallocating buffer from %zu to %zu bytes\n", __func__, buf_size, buf_size_new);
 
         // reallocate
-        buf_size = buf_size_new;
-        buf      = realloc(buf, buf_size);
-        if (buf == nullptr) {
+        buf_size             = buf_size_new;
+        static void* buf_new = realloc(buf, buf_size);
+        if (buf_new == nullptr) {
             fprintf(stderr, "%s: failed to allocate %zu bytes\n", __func__, buf_size);
             return false;
+        }
+        else {
+            buf = buf_new;
         }
     }
 
