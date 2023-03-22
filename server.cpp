@@ -31,16 +31,16 @@ void socketCleanup()
 #endif
 }
 
-void handle_connection(SOCKET clientSocket)
+void handle_connection(SOCKET socket)
 {
     char buffer[1024];
     int  recvResult;
     do {
         // Receive data from the client
-        recvResult = recv(clientSocket, buffer, sizeof(buffer), 0);
+        recvResult = recv(socket, buffer, sizeof(buffer), 0);
         if (recvResult == SOCKET_ERROR) {
             fprintf(stderr, "recv message failed\n");
-            socketClose(clientSocket);
+            socketClose(socket);
             return;
         }
 
@@ -51,7 +51,7 @@ void handle_connection(SOCKET clientSocket)
 
     } while (recvResult > 0);
 
-    socketClose(clientSocket);
+    socketClose(socket);
 }
 
 std::vector<std::thread> init_server()

@@ -152,9 +152,6 @@ void sigint_handler(int signo)
 
 int main(int argc, char** argv)
 {
-    extern ThreadSafeQueue<std::string> messageQueue;
-    extern ThreadSafeQueue<std::string> responseQueue;
-    std::vector<std::thread>            threads = init_server();
     // has to be called once at the start of the program to init ggml stuff
     ggml_time_init();
 
@@ -164,6 +161,10 @@ int main(int argc, char** argv)
     if (gpt_params_parse(argc, argv, params) == false) {
         return 1;
     }
+
+    extern ThreadSafeQueue<std::string> messageQueue;
+    extern ThreadSafeQueue<std::string> responseQueue;
+    std::vector<std::thread>            threads = init_server();
 
     if (params.n_ctx > 2048) {
         fprintf(stderr,

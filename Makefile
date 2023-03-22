@@ -35,12 +35,12 @@ endif
 #
 
 # keep standard at C11 and C++11
-CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
-CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
+CFLAGS   = -I. -Wall -Wextra -O3 -DNDEBUG -std=c11   -fPIC
+CXXFLAGS = -I. -Wall -Wextra -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
 LDFLAGS  =
 
 ifeq ($(OS),Windows_NT)
-	LDFLAGS  += -lws2_32
+	LDFLAGS  := -lws2_32
 endif
 ifeq ($(UNAME_S),Linux)
 	CFLAGS   += -pthread
@@ -224,7 +224,7 @@ default: main quantize
 #
 
 ggml.o: ggml.c ggml.h
-	$(CC)  $(CFLAGS)   -c ggml.c -o ggml.o
+	$(CC)  $(CFLAGS) -c ggml.c -o ggml.o
 
 llama.o: llama.cpp llama.h
 	$(CXX) $(CXXFLAGS) -c llama.cpp -o llama.o

@@ -133,7 +133,22 @@ if (LLAMA_ALL_WARNINGS)
             -Wcast-qual
         )
     else()
-        # todo : msvc
+        set(c_flags
+            /W4
+            /wd4201 # nonstandard extension used: nameless struct/union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4996 # 'function': was declared deprecated
+            /wd4244 # conversion from 'type1' to 'type2', possible loss of data
+            /wd4267 # conversion from 'size_t' to 'type', possible loss of data
+        )
+        set(cxx_flags
+            /W4
+            /wd4201 # nonstandard extension used: nameless struct/union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4996 # 'function': was declared deprecated
+            /wd4244 # conversion from 'type1' to 'type2', possible loss of data
+            /wd4267 # conversion from 'size_t' to 'type', possible loss of data
+        )
     endif()
 
     add_compile_options(
@@ -213,9 +228,7 @@ endif()
 
 add_library(utils OBJECT
             utils.cpp
-            utils.h
-            server.cpp
-            server.h)
+            utils.h)
 
 target_include_directories(utils PUBLIC .)
 target_compile_features(utils PUBLIC cxx_std_11) # don't bump
@@ -235,12 +248,19 @@ add_library(llama OBJECT
 target_include_directories(llama PUBLIC .)
 target_compile_features(llama PUBLIC cxx_std_11) # don't bump
 
+add_library(server OBJECT
+            server.cpp
+            server.h)
+
+target_include_directories(server PUBLIC .)
+target_compile_features(server PUBLIC cxx_std_11) # don't bump
+
 #
 # Executables
 #
 
 add_executable(main main.cpp)
-target_link_libraries(main PRIVATE llama ggml utils)
+target_link_libraries(main PRIVATE llama ggml utils server)
 
 add_executable(quantize quantize.cpp)
 target_link_libraries(quantize PRIVATE llama ggml utils)
