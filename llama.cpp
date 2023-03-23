@@ -4,11 +4,12 @@
 
 #include <cassert>
 #include <cinttypes>
+#include <cstring>
 #include <fstream>
 #include <queue>
 #include <random>
 #include <regex>
-#include <unordered_map>
+
 
 // determine number of model parts based on the dimension
 static const std::unordered_map<int, int> LLAMA_N_PARTS = {

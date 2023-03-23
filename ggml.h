@@ -634,8 +634,8 @@ enum ggml_opt_result ggml_opt(struct ggml_context* ctx, struct ggml_opt_params p
 // quantization
 //
 
-size_t ggml_quantize_q4_0(float * src, void * dst, int n, int k, int qk, int64_t * hist);
-size_t ggml_quantize_q4_1(float * src, void * dst, int n, int k, int qk, int64_t * hist);
+size_t ggml_quantize_q4_0(const float * src, void * dst, int n, int k, int qk, int64_t * hist);
+size_t ggml_quantize_q4_1(const float * src, void * dst, int n, int k, int qk, int64_t * hist);
 
 //
 // system info
