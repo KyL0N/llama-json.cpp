@@ -134,7 +134,7 @@ if (LLAMA_ALL_WARNINGS)
         )
     else()
         set(c_flags
-            /W4
+            /W4     # all warnings
             /wd4201 # nonstandard extension used: nameless struct/union
             /wd4324 # structure was padded due to alignment specifier
             /wd4996 # 'function': was declared deprecated
@@ -142,7 +142,7 @@ if (LLAMA_ALL_WARNINGS)
             /wd4267 # conversion from 'size_t' to 'type', possible loss of data
         )
         set(cxx_flags
-            /W4
+            /W4     # all warnings
             /wd4201 # nonstandard extension used: nameless struct/union
             /wd4324 # structure was padded due to alignment specifier
             /wd4996 # 'function': was declared deprecated
@@ -250,27 +250,16 @@ target_include_directories(llama PUBLIC .)
 target_compile_features(llama PUBLIC cxx_std_11) # don't bump
 target_link_libraries(llama PRIVATE utils ggml ${LLAMA_EXTRA_LIBS})
 
-add_library(server OBJECT
-            server.cpp
-            server.h)
-
-target_include_directories(server PUBLIC .)
-target_compile_features(server PUBLIC cxx_std_11) # don't bump
-
 #
 # Executables
 #
 
 add_executable(main main.cpp)
-target_link_libraries(main PRIVATE llama ggml utils server)
+target_link_libraries(main PRIVATE llama ggml utils)
 
 add_executable(quantize quantize.cpp)
 target_link_libraries(quantize PRIVATE llama ggml utils)
 
-# if windows, link ws2_32
-if (WIN32)
-    target_link_libraries(main PRIVATE ws2_32)
-endif()
 #
 # programs, examples and tests
 #
@@ -280,6 +269,6 @@ if (LLAMA_BUILD_TESTS AND NOT CMAKE_JS_VERSION)
     add_subdirectory(tests)
 endif ()
 
-#if (LLAMA_BUILD_EXAMPLES)
-#    add_subdirectory(examples)
-#endif()
+if (LLAMA_BUILD_EXAMPLES)
+   add_subdirectory(examples/server)
+endif()

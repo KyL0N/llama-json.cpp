@@ -9,7 +9,7 @@
 #include <queue>
 #include <random>
 #include <regex>
-
+#include <unordered_map>
 
 // determine number of model parts based on the dimension
 static const std::unordered_map<int, int> LLAMA_N_PARTS = {
@@ -178,7 +178,7 @@ static bool llama_model_load(const std::string& fname, llama_context& lctx, int 
         auto& hparams = model.hparams;
 
         fin.read((char*)&hparams.n_vocab, sizeof(hparams.n_vocab));
-        // fin.read((char*)&hparams.n_ctx, sizeof(hparams.n_ctx));
+        // fin.read((char *) &hparams.n_ctx,   sizeof(hparams.n_ctx));
         fin.read((char*)&hparams.n_embd, sizeof(hparams.n_embd));
         fin.read((char*)&hparams.n_mult, sizeof(hparams.n_mult));
         fin.read((char*)&hparams.n_head, sizeof(hparams.n_head));
@@ -434,9 +434,9 @@ static bool llama_model_load(const std::string& fname, llama_context& lctx, int 
 
                 int32_t nelements = 1;
                 int32_t ne[2]     = {1, 1};
-                for (int j = 0; j < n_dims; ++j) {
-                    fin.read(reinterpret_cast<char*>(&ne[j]), sizeof(ne[j]));
-                    nelements *= ne[j];
+                for (int i = 0; i < n_dims; ++i) {
+                    fin.read(reinterpret_cast<char*>(&ne[i]), sizeof(ne[i]));
+                    nelements *= ne[i];
                 }
 
                 std::string name(length, 0);

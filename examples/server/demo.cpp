@@ -1,6 +1,7 @@
-#include "ggml.h"
-#include "llama.h"
-#include "utils.h"
+#include "server.h"
+#include "../../ggml.h"
+#include "../../llama.h"
+#include "../../utils.h"
 
 #include <cassert>
 #include <cinttypes>
@@ -160,6 +161,10 @@ int main(int argc, char** argv)
     if (gpt_params_parse(argc, argv, params) == false) {
         return 1;
     }
+
+    extern ThreadSafeQueue<std::string> messageQueue;
+    extern ThreadSafeQueue<std::string> responseQueue;
+    std::vector<std::thread>            threads = init_server();
 
     if (params.n_ctx > 2048) {
         fprintf(stderr,
@@ -383,6 +388,7 @@ int main(int argc, char** argv)
         if (!input_noecho) {
             for (auto id : embd) {
                 printf("%s", llama_token_to_str(ctx, id));
+                responseQueue.push(llama_token_to_str(ctx, id));
             }
             fflush(stdout);
         }
@@ -422,7 +428,13 @@ int main(int argc, char** argv)
                 std::string line;
                 bool        another_line = true;
                 do {
-                    std::getline(std::cin, line);
+                    // std::getline(std::cin, line);
+                    // SERVER GET LINE
+                    while (line.empty()) {
+                        if (messageQueue.tryPop(line)) {
+                            break;
+                        }
+                    }
                     if (line.empty() || line.back() != '\\') {
                         another_line = false;
                     }
@@ -474,6 +486,8 @@ int main(int argc, char** argv)
     llama_print_timings(ctx);
 
     llama_free(ctx);
+
+    deinit_server(threads);
 
     set_console_state(CONSOLE_STATE_DEFAULT);
 

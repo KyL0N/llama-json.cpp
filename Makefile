@@ -218,7 +218,7 @@ $(info I CXX:      $(CXXV))
 $(info )
 
 default: main quantize
-
+examples: server
 #
 # Build library
 #
@@ -232,18 +232,25 @@ llama.o: llama.cpp llama.h
 utils.o: utils.cpp utils.h
 	$(CXX) $(CXXFLAGS) -c utils.cpp -o utils.o
 
-server.o: server.cpp server.h
-	$(CXX) $(CXXFLAGS) -c server.cpp -o server.o
-
 clean:
 	rm -f *.o main quantize
 
-main: main.cpp ggml.o llama.o utils.o server.o
-	$(CXX) $(CXXFLAGS) main.cpp ggml.o llama.o utils.o server.o -o main $(LDFLAGS)
+main: main.cpp ggml.o llama.o utils.o
+	$(CXX) $(CXXFLAGS) main.cpp ggml.o llama.o utils.o -o main $(LDFLAGS)
 	@echo "\x1b[36mrun ./main -h for help\x1b[0m"
+
+
 
 quantize: quantize.cpp ggml.o llama.o utils.o
 	$(CXX) $(CXXFLAGS) quantize.cpp ggml.o llama.o utils.o -o quantize $(LDFLAGS)
+
+#
+# Examples
+#
+
+server: examples/server/demo.cpp examples/server/server.cpp examples/server/server.h ggml.o llama.o utils.o
+	$(CXX) $(CXXFLAGS) examples/server/demo.cpp examples/server/server.cpp ggml.o llama.o utils.o -o server $(LDFLAGS)
+	@echo "\x1b[36mrun ./server -h for help\x1b[0m"
 
 #
 # Tests
