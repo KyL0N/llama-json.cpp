@@ -270,5 +270,5 @@ if (LLAMA_BUILD_TESTS AND NOT CMAKE_JS_VERSION)
 endif ()
 
 if (LLAMA_BUILD_EXAMPLES)
-   add_subdirectory(examples)
+   add_subdirectory(examples/server)
 endif()
