@@ -16,19 +16,17 @@
 //  - automatic differentiation
 //  - basic optimization algorithms
 //
-// The aim of this library is to provide a minimalistic approach for various
-// machine learning tasks. This includes, but is not limited to, the following:
+// The aim of this library is to provide a minimalistic approach for various machine learning tasks. This includes,
+// but is not limited to, the following:
 //
 //  - linear regression
 //  - support vector machines
 //  - neural networks
 //
-// The library allows the user to define a certain function using the available
-// tensor operations. This function definition is represented internally via a
-// computation graph. Each tensor operation in the function definition
-// corresponds to a node in the graph. Having the computation graph defined, the
-// user can choose to compute the function's value and/or its gradient with
-// respect to the input variables. Optionally, the function can be optimized
+// The library allows the user to define a certain function using the available tensor operations. This function
+// definition is represented internally via a computation graph. Each tensor operation in the function definition
+// corresponds to a node in the graph. Having the computation graph defined, the user can choose to compute the
+// function's value and/or its gradient with respect to the input variables. Optionally, the function can be optimized
 // using one of the available optimization algorithms.
 //
 // For example, here we define the function: f(x) = a*x^2 + b
@@ -54,9 +52,8 @@
 //       ...
 //   }
 //
-// Notice that the function definition above does not involve any actual
-// computation. The computation is performed only when the user explicitly
-// requests it. For example, to compute the function's value at x = 2.0:
+// Notice that the function definition above does not involve any actual computation. The computation is performed only
+// when the user explicitly requests it. For example, to compute the function's value at x = 2.0:
 //
 //   {
 //       ...
@@ -77,42 +74,35 @@
 //
 // The actual computation is performed in the ggml_graph_compute() function.
 //
-// The ggml_new_tensor_...() functions create new tensors. They are allocated in
-// the memory buffer provided to the ggml_init() function. You have to be
-// careful not to exceed the memory buffer size. Therefore, you have to know in
-// advance how much memory you need for your computation. Alternatively, you can
-// allocate a large enough memory and after defining the computation graph, call
-// the ggml_used_mem() function to find out how much memory was actually needed.
+// The ggml_new_tensor_...() functions create new tensors. They are allocated in the memory buffer provided to the
+// ggml_init() function. You have to be careful not to exceed the memory buffer size. Therefore, you have to know
+// in advance how much memory you need for your computation. Alternatively, you can allocate a large enough memory
+// and after defining the computation graph, call the ggml_used_mem() function to find out how much memory was
+// actually needed.
 //
-// The ggml_set_param() function marks a tensor as an input variable. This is
-// used by the automatic differentiation and optimization algorithms.
+// The ggml_set_param() function marks a tensor as an input variable. This is used by the automatic
+// differentiation and optimization algorithms.
 //
-// The described approach allows to define the function graph once and then
-// compute its forward or backward graphs multiple times. All computations will
-// use the same memory buffer allocated in the ggml_init() function. This way
+// The described approach allows to define the function graph once and then compute its forward or backward graphs
+// multiple times. All computations will use the same memory buffer allocated in the ggml_init() function. This way
 // the user can avoid the memory allocation overhead at runtime.
 //
-// The library supports multi-dimensional tensors - up to 4 dimensions. The FP16
-// and FP32 data types are first class citizens, but in theory the library can
-// be extended to support FP8 and integer data types.
+// The library supports multi-dimensional tensors - up to 4 dimensions. The FP16 and FP32 data types are first class
+// citizens, but in theory the library can be extended to support FP8 and integer data types.
 //
-// Each tensor operation produces a new tensor. Initially the library was
-// envisioned to support only the use of unary and binary operations. Most of
-// the available operations fall into one of these two categories. With time, it
-// became clear that the library needs to support more complex operations. The
-// way to support these operations is not clear yet, but a few examples are
-// demonstrated in the following operations:
+// Each tensor operation produces a new tensor. Initially the library was envisioned to support only the use of unary
+// and binary operations. Most of the available operations fall into one of these two categories. With time, it became
+// clear that the library needs to support more complex operations. The way to support these operations is not clear
+// yet, but a few examples are demonstrated in the following operations:
 //
 //   - ggml_permute()
 //   - ggml_conv_1d_1s()
 //   - ggml_conv_1d_2s()
 //
-// For each tensor operator, the library implements a forward and backward
-// computation function. The forward function computes the output tensor value
-// given the input tensor values. The backward function computes the adjoint of
-// the input tensors given the adjoint of the output tensor. For a detailed
-// explanation of what this means, take a calculus class, or watch the following
-// video:
+// For each tensor operator, the library implements a forward and backward computation function. The forward function
+// computes the output tensor value given the input tensor values. The backward function computes the adjoint of the
+// input tensors given the adjoint of the output tensor. For a detailed explanation of what this means, take a
+// calculus class, or watch the following video:
 //
 //   What is Automatic Differentiation?
 //   https://www.youtube.com/watch?v=wG_nF1awSSY
@@ -120,11 +110,9 @@
 //
 // ## Tensor data (struct ggml_tensor)
 //
-// The tensors are stored in memory via the ggml_tensor struct. The structure
-// provides information about the size of the tensor, the data type, and the
-// memory buffer where the tensor data is stored. Additionally, it contains
-// pointers to the "source" tensors - i.e. the tensors that were used to compute
-// the current tensor. For example:
+// The tensors are stored in memory via the ggml_tensor struct. The structure provides information about the size of
+// the tensor, the data type, and the memory buffer where the tensor data is stored. Additionally, it contains
+// pointers to the "source" tensors - i.e. the tensors that were used to compute the current tensor. For example:
 //
 //   {
 //       struct ggml_tensor * c = ggml_add(ctx, a, b);
@@ -133,12 +121,11 @@
 //       assert(c->src[1] == b);
 //   }
 //
-// The multi-dimensional tensors are stored in row-major order. The ggml_tensor
-// struct contains fields for the number of elements in each dimension ("ne") as
-// well as the number of bytes ("nb", a.k.a. stride). This allows to store
-// tensors that are not contiguous in memory, which is useful for operations
-// such as transposition and permutation. All tensor operations have to take the
-// stride into account and not assume that the tensor is contiguous in memory.
+// The multi-dimensional tensors are stored in row-major order. The ggml_tensor struct contains fields for the
+// number of elements in each dimension ("ne") as well as the number of bytes ("nb", a.k.a. stride). This allows
+// to store tensors that are not contiguous in memory, which is useful for operations such as transposition and
+// permutation. All tensor operations have to take the stride into account and not assume that the tensor is
+// contiguous in memory.
 //
 // The data of the tensor is accessed via the "data" pointer. For example:
 //
@@ -154,8 +141,7 @@
 //       ...
 //   }
 //
-// Alternatively, there are helper functions, such as ggml_get_f32_1d() and
-// ggml_set_f32_1d() that can be used.
+// Alternatively, there are helper functions, such as ggml_get_f32_1d() and ggml_set_f32_1d() that can be used.
 //
 // ## The matrix multiplication operator (ggml_mul_mat)
 //
@@ -183,19 +169,19 @@
 //
 //
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 extern "C" {
 #endif
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
 
-#define GGML_MAX_DIMS 4
-#define GGML_MAX_NODES 4096
-#define GGML_MAX_PARAMS 16
+#define GGML_MAX_DIMS     4
+#define GGML_MAX_NODES    4096
+#define GGML_MAX_PARAMS   16
 #define GGML_MAX_CONTEXTS 64
-#define GGML_MAX_OPT 4
+#define GGML_MAX_OPT      4
 
 #ifdef __ARM_NEON
 // we use the built-in 16-bit float type
@@ -243,7 +229,7 @@ enum ggml_op {
     GGML_OP_RELU,
     GGML_OP_GELU,
     GGML_OP_SILU,
-    GGML_OP_NORM,  // normalize
+    GGML_OP_NORM, // normalize
     GGML_OP_RMS_NORM,
 
     GGML_OP_MUL_MAT,
@@ -268,26 +254,25 @@ enum ggml_op {
 };
 
 // n-dimensional tensor
-struct ggml_tensor
-{
+struct ggml_tensor {
     enum ggml_type type;
 
     int    n_dims;
-    int    ne[GGML_MAX_DIMS];  // number of elements
-    size_t nb[GGML_MAX_DIMS];  // stride in bytes:
-                               // nb[0] = sizeof(type)
-                               // nb[1] = nb[0]   * ne[0] + padding
-                               // nb[i] = nb[i-1] * ne[i-1]
+    int    ne[GGML_MAX_DIMS]; // number of elements
+    size_t nb[GGML_MAX_DIMS]; // stride in bytes:
+                              // nb[0] = sizeof(type)
+                              // nb[1] = nb[0]   * ne[0] + padding
+                              // nb[i] = nb[i-1] * ne[i-1]
 
     // compute data
     enum ggml_op op;
 
     bool is_param;
 
-    struct ggml_tensor* grad;
-    struct ggml_tensor* src0;
-    struct ggml_tensor* src1;
-    struct ggml_tensor* opt[GGML_MAX_OPT];
+    struct ggml_tensor * grad;
+    struct ggml_tensor * src0;
+    struct ggml_tensor * src1;
+    struct ggml_tensor * opt[GGML_MAX_OPT];
 
     // thread scheduling
     int n_tasks;
@@ -297,23 +282,22 @@ struct ggml_tensor
     int64_t perf_cycles;
     int64_t perf_time_us;
 
-    void* data;
-    char  padding[8];
+    void * data;
+    char padding[8];
 };
 
 // computation graph
-struct ggml_cgraph
-{
+struct ggml_cgraph {
     int n_nodes;
     int n_leafs;
     int n_threads;
 
-    size_t              work_size;
-    struct ggml_tensor* work;
+    size_t work_size;
+    struct ggml_tensor * work;
 
-    struct ggml_tensor* nodes[GGML_MAX_NODES];
-    struct ggml_tensor* grads[GGML_MAX_NODES];
-    struct ggml_tensor* leafs[GGML_MAX_NODES];
+    struct ggml_tensor * nodes[GGML_MAX_NODES];
+    struct ggml_tensor * grads[GGML_MAX_NODES];
+    struct ggml_tensor * leafs[GGML_MAX_NODES];
 
     // performance
     int     perf_runs;
@@ -322,214 +306,341 @@ struct ggml_cgraph
 };
 
 // scratch buffer
-struct ggml_scratch
-{
+struct ggml_scratch {
     size_t offs;
     size_t size;
-    void*  data;
+    void * data;
 };
 
-struct ggml_init_params
-{
+struct ggml_init_params {
     // memory pool
-    size_t mem_size;    // bytes
-    void*  mem_buffer;  // if NULL, memory will be allocated internally
+    size_t mem_size;   // bytes
+    void * mem_buffer; // if NULL, memory will be allocated internally
 };
 
-void    ggml_time_init(void);  // call this once at the beginning of the program
+void    ggml_time_init(void); // call this once at the beginning of the program
 int64_t ggml_time_ms(void);
 int64_t ggml_time_us(void);
 int64_t ggml_cycles(void);
 int64_t ggml_cycles_per_ms(void);
 
-void ggml_print_object(const struct ggml_object* obj);
-void ggml_print_objects(const struct ggml_context* ctx);
+void ggml_print_object (const struct ggml_object * obj);
+void ggml_print_objects(const struct ggml_context * ctx);
 
-int    ggml_nelements(const struct ggml_tensor* tensor);
-size_t ggml_nbytes(const struct ggml_tensor* tensor);
+int    ggml_nelements(const struct ggml_tensor * tensor);
+size_t ggml_nbytes   (const struct ggml_tensor * tensor);
 
-int    ggml_blck_size(enum ggml_type type);
-size_t ggml_type_size(enum ggml_type type);   // size in bytes for all elements in a block
-float  ggml_type_sizef(enum ggml_type type);  // ggml_type_size()/ggml_blck_size() as float
+int    ggml_blck_size (enum ggml_type type);
+size_t ggml_type_size (enum ggml_type type); // size in bytes for all elements in a block
+float  ggml_type_sizef(enum ggml_type type); // ggml_type_size()/ggml_blck_size() as float
 
-size_t ggml_element_size(const struct ggml_tensor* tensor);
+size_t ggml_element_size(const struct ggml_tensor * tensor);
 
-struct ggml_context* ggml_init(struct ggml_init_params params);
-void                 ggml_free(struct ggml_context* ctx);
+struct ggml_context * ggml_init(struct ggml_init_params params);
+void ggml_free(struct ggml_context * ctx);
 
-size_t ggml_used_mem(const struct ggml_context* ctx);
+size_t ggml_used_mem(const struct ggml_context * ctx);
 
-size_t ggml_set_scratch(struct ggml_context* ctx, struct ggml_scratch scratch);
+size_t ggml_set_scratch(struct ggml_context * ctx, struct ggml_scratch scratch);
 
-struct ggml_tensor* ggml_new_tensor(struct ggml_context* ctx, enum ggml_type type, int n_dims, const int* ne);
+struct ggml_tensor * ggml_new_tensor(
+        struct ggml_context * ctx,
+        enum   ggml_type type,
+        int    n_dims,
+        const int *ne);
 
-struct ggml_tensor* ggml_new_tensor_1d(struct ggml_context* ctx, enum ggml_type type, int ne0);
+struct ggml_tensor * ggml_new_tensor_1d(
+        struct ggml_context * ctx,
+        enum   ggml_type type,
+        int    ne0);
 
-struct ggml_tensor* ggml_new_tensor_2d(struct ggml_context* ctx, enum ggml_type type, int ne0, int ne1);
+struct ggml_tensor * ggml_new_tensor_2d(
+        struct ggml_context * ctx,
+        enum   ggml_type type,
+        int    ne0,
+        int    ne1);
 
-struct ggml_tensor* ggml_new_tensor_3d(struct ggml_context* ctx, enum ggml_type type, int ne0, int ne1, int ne2);
+struct ggml_tensor * ggml_new_tensor_3d(
+        struct ggml_context * ctx,
+        enum   ggml_type type,
+        int    ne0,
+        int    ne1,
+        int    ne2);
 
-struct ggml_tensor* ggml_new_tensor_4d(struct ggml_context* ctx, enum ggml_type type, int ne0, int ne1, int ne2, int ne3);
+struct ggml_tensor * ggml_new_tensor_4d(
+        struct ggml_context * ctx,
+        enum   ggml_type type,
+        int    ne0,
+        int    ne1,
+        int    ne2,
+        int    ne3);
 
-struct ggml_tensor* ggml_new_i32(struct ggml_context* ctx, int32_t value);
-struct ggml_tensor* ggml_new_f32(struct ggml_context* ctx, float value);
+struct ggml_tensor * ggml_new_i32(struct ggml_context * ctx, int32_t value);
+struct ggml_tensor * ggml_new_f32(struct ggml_context * ctx, float value);
 
-struct ggml_tensor* ggml_dup_tensor(struct ggml_context* ctx, const struct ggml_tensor* src);
-struct ggml_tensor* ggml_view_tensor(struct ggml_context* ctx, const struct ggml_tensor* src);
+struct ggml_tensor * ggml_dup_tensor (struct ggml_context * ctx, const struct ggml_tensor * src);
+struct ggml_tensor * ggml_view_tensor(struct ggml_context * ctx, const struct ggml_tensor * src);
 
-struct ggml_tensor* ggml_set_zero(struct ggml_tensor* tensor);
-struct ggml_tensor* ggml_set_i32(struct ggml_tensor* tensor, int32_t value);
-struct ggml_tensor* ggml_set_f32(struct ggml_tensor* tensor, float value);
+struct ggml_tensor * ggml_set_zero(struct ggml_tensor * tensor);
+struct ggml_tensor * ggml_set_i32 (struct ggml_tensor * tensor, int32_t value);
+struct ggml_tensor * ggml_set_f32 (struct ggml_tensor * tensor, float value);
 
-int32_t ggml_get_i32_1d(const struct ggml_tensor* tensor, int i);
-void    ggml_set_i32_1d(const struct ggml_tensor* tensor, int i, int32_t value);
+int32_t ggml_get_i32_1d(const struct ggml_tensor * tensor, int i);
+void    ggml_set_i32_1d(const struct ggml_tensor * tensor, int i, int32_t value);
 
-float ggml_get_f32_1d(const struct ggml_tensor* tensor, int i);
-void  ggml_set_f32_1d(const struct ggml_tensor* tensor, int i, float value);
+float ggml_get_f32_1d(const struct ggml_tensor * tensor, int i);
+void  ggml_set_f32_1d(const struct ggml_tensor * tensor, int i, float value);
 
-void*  ggml_get_data(const struct ggml_tensor* tensor);
-float* ggml_get_data_f32(const struct ggml_tensor* tensor);
+ void * ggml_get_data    (const struct ggml_tensor * tensor);
+float * ggml_get_data_f32(const struct ggml_tensor * tensor);
 
 //
 // operations on tensors with backpropagation
 //
 
-struct ggml_tensor* ggml_dup(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_dup(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_add(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_add(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_sub(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_sub(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_mul(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_mul(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_div(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_div(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_sqr(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_sqr(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_sqrt(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_sqrt(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // return scalar
 // TODO: compute sum along rows
-struct ggml_tensor* ggml_sum(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_sum(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // mean along rows
-struct ggml_tensor* ggml_mean(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_mean(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // if a is the same shape as b, and a is not parameter, return a
 // otherwise, return a new tensor: repeat(a) to fit in b
-struct ggml_tensor* ggml_repeat(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_repeat(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_abs(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_abs(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_sgn(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_sgn(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_neg(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_neg(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_step(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_step(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_relu(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_relu(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // TODO: double-check this computation is correct
-struct ggml_tensor* ggml_gelu(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_gelu(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_silu(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_silu(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // normalize along rows
 // TODO: eps is hardcoded to 1e-5 for now
-struct ggml_tensor* ggml_norm(struct ggml_context* ctx, struct ggml_tensor* a);
-struct ggml_tensor* ggml_rms_norm(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_norm(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_rms_norm(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_rms_norm(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // A: m rows, n columns
 // B: p rows, n columns (i.e. we transpose it internally)
 // result is m columns, p rows
-struct ggml_tensor* ggml_mul_mat(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_mul_mat(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
 //
 // operations on tensors without backpropagation
 //
 
 // in-place, returns view(a)
-struct ggml_tensor* ggml_scale(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_scale(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
 // a -> b, return view(b)
-struct ggml_tensor* ggml_cpy(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_cpy(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
 // return view(a), b specifies the new shape
 // TODO: when we start computing gradient, make a copy instead of view
-struct ggml_tensor* ggml_reshape(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_reshape(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
 // return view(a)
 // TODO: when we start computing gradient, make a copy instead of view
-struct ggml_tensor* ggml_reshape_2d(struct ggml_context* ctx, struct ggml_tensor* a, int ne0, int ne1);
+struct ggml_tensor * ggml_reshape_2d(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   ne0,
+        int                   ne1);
 
 // return view(a)
 // TODO: when we start computing gradient, make a copy instead of view
-struct ggml_tensor* ggml_reshape_3d(struct ggml_context* ctx, struct ggml_tensor* a, int ne0, int ne1, int ne2);
+struct ggml_tensor * ggml_reshape_3d(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   ne0,
+        int                   ne1,
+        int                   ne2);
 
 // offset in bytes
-struct ggml_tensor* ggml_view_1d(struct ggml_context* ctx, struct ggml_tensor* a, int ne0, size_t offset);
+struct ggml_tensor * ggml_view_1d(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   ne0,
+        size_t                offset);
 
-struct ggml_tensor* ggml_view_2d(struct ggml_context* ctx,
-                                 struct ggml_tensor*  a,
-                                 int                  ne0,
-                                 int                  ne1,
-                                 size_t               nb1,  // row stride in bytes
-                                 size_t               offset);
+struct ggml_tensor * ggml_view_2d(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   ne0,
+        int                   ne1,
+        size_t                nb1, // row stride in bytes
+        size_t                offset);
 
-struct ggml_tensor* ggml_permute(struct ggml_context* ctx, struct ggml_tensor* a, int axis0, int axis1, int axis2, int axis3);
+struct ggml_tensor * ggml_permute(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   axis0,
+        int                   axis1,
+        int                   axis2,
+        int                   axis3);
 
 // alias for ggml_permute(ctx, a, 1, 0, 2, 3)
-struct ggml_tensor* ggml_transpose(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_transpose(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
-struct ggml_tensor* ggml_get_rows(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_get_rows(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
 // set elements above the diagonal to -INF
 // in-place, returns view(a)
-struct ggml_tensor* ggml_diag_mask_inf(struct ggml_context* ctx, struct ggml_tensor* a, int n_past);
+struct ggml_tensor * ggml_diag_mask_inf(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   n_past);
 
 // in-place, returns view(a)
-struct ggml_tensor* ggml_soft_max(struct ggml_context* ctx, struct ggml_tensor* a);
+struct ggml_tensor * ggml_soft_max(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a);
 
 // rotary position embedding
 // in-place, returns view(a)
 // if mode == 1, skip n_past elements
 // TODO: avoid creating a new tensor every time
-struct ggml_tensor* ggml_rope(struct ggml_context* ctx, struct ggml_tensor* a, int n_past, int n_dims, int mode);
+struct ggml_tensor * ggml_rope(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        int                   n_past,
+        int                   n_dims,
+        int                   mode);
 
 // padding = 1
 // TODO: we don't support extra parameters for now
 //       that's why we are hard-coding the stride, padding, and dilation
 //       not great ..
-struct ggml_tensor* ggml_conv_1d_1s(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_conv_1d_1s(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_conv_1d_2s(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b);
+struct ggml_tensor * ggml_conv_1d_2s(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b);
 
-struct ggml_tensor* ggml_flash_attn(struct ggml_context* ctx, struct ggml_tensor* q, struct ggml_tensor* k, struct ggml_tensor* v, bool masked);
+struct ggml_tensor * ggml_flash_attn(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * q,
+        struct ggml_tensor  * k,
+        struct ggml_tensor  * v,
+        bool                  masked);
 
-struct ggml_tensor*
-ggml_flash_ff(struct ggml_context* ctx, struct ggml_tensor* a, struct ggml_tensor* b0, struct ggml_tensor* b1, struct ggml_tensor* c0, struct ggml_tensor* c1);
+struct ggml_tensor * ggml_flash_ff(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b0,
+        struct ggml_tensor  * b1,
+        struct ggml_tensor  * c0,
+        struct ggml_tensor  * c1);
 
 //
 // automatic differentiation
 //
 
-void ggml_set_param(struct ggml_context* ctx, struct ggml_tensor* tensor);
+void ggml_set_param(
+        struct ggml_context * ctx,
+        struct ggml_tensor * tensor);
 
-void ggml_build_forward_expand(struct ggml_cgraph* cgraph, struct ggml_tensor* tensor);
+void ggml_build_forward_expand(struct ggml_cgraph * cgraph, struct ggml_tensor * tensor);
 
-struct ggml_cgraph ggml_build_forward(struct ggml_tensor* tensor);
-struct ggml_cgraph ggml_build_backward(struct ggml_context* ctx, struct ggml_cgraph* gf, bool keep);
+struct ggml_cgraph ggml_build_forward (struct ggml_tensor * tensor);
+struct ggml_cgraph ggml_build_backward(struct ggml_context * ctx, struct ggml_cgraph * gf, bool keep);
 
-void ggml_graph_compute(struct ggml_context* ctx, struct ggml_cgraph* cgraph);
-void ggml_graph_reset(struct ggml_cgraph* cgraph);
+void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph);
+void ggml_graph_reset  (struct ggml_cgraph * cgraph);
 
 // print info and performance information for the graph
-void ggml_graph_print(const struct ggml_cgraph* cgraph);
+void ggml_graph_print(const struct ggml_cgraph * cgraph);
 
 // dump the graph into a file using the dot format
-void ggml_graph_dump_dot(const struct ggml_cgraph* gb, const struct ggml_cgraph* gf, const char* filename);
+void ggml_graph_dump_dot(const struct ggml_cgraph * gb, const struct ggml_cgraph * gf, const char * filename);
 
 //
 // optimization
@@ -569,8 +680,7 @@ enum ggml_opt_result {
 //
 //   see ggml.c (ggml_opt_default_params) for default values
 //
-struct ggml_opt_params
-{
+struct ggml_opt_params {
     enum ggml_opt_type type;
 
     int n_threads;
@@ -581,7 +691,7 @@ struct ggml_opt_params
     //   if past > 0:
     //     stop if |f(x) - f(x_past)| < delta * max(1, |f(x)|)
     //
-    int   past;
+    int past;
     float delta;
 
     // maximum number of iterations without improvement
@@ -596,27 +706,25 @@ struct ggml_opt_params
     bool print_backward_graph;
 
     // ADAM parameters
-    struct
-    {
+    struct {
         int n_iter;
 
-        float alpha;  // learning rate
+        float alpha; // learning rate
         float beta1;
         float beta2;
-        float eps;    // epsilon for numerical stability
-        float eps_f;  // epsilon for convergence test
-        float eps_g;  // epsilon for convergence test
+        float eps;   // epsilon for numerical stability
+        float eps_f; // epsilon for convergence test
+        float eps_g; // epsilon for convergence test
     } adam;
 
     // LBFGS parameters
-    struct
-    {
-        int m;  // number of corrections to approximate the inv. Hessian
+    struct {
+        int m; // number of corrections to approximate the inv. Hessian
         int n_iter;
         int max_linesearch;
 
-        float eps;   // convergence tolerance
-        float ftol;  // line search tolerance
+        float eps;      // convergence tolerance
+        float ftol;     // line search tolerance
         float wolfe;
         float min_step;
         float max_step;
@@ -628,7 +736,10 @@ struct ggml_opt_params
 struct ggml_opt_params ggml_opt_default_params(enum ggml_opt_type type);
 
 // optimize the function defined by the tensor f
-enum ggml_opt_result ggml_opt(struct ggml_context* ctx, struct ggml_opt_params params, struct ggml_tensor* f);
+enum ggml_opt_result ggml_opt(
+        struct ggml_context * ctx,
+        struct ggml_opt_params params,
+        struct ggml_tensor * f);
 
 //
 // quantization
@@ -654,6 +765,6 @@ int ggml_cpu_has_blas(void);
 int ggml_cpu_has_sse3(void);
 int ggml_cpu_has_vsx(void);
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 }
 #endif

@@ -1,13 +1,9 @@
 *.o
 *.a
-*.exe
-prompt.txt
-run.sh
 .cache/
 .vs/
 .vscode/
 .DS_Store
-.clang-format
 
 build/
 build-em/
@@ -29,4 +25,3 @@ compile_commands.json
 
 .envrc
 .direnv/
-.clang-format

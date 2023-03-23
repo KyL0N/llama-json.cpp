@@ -9,8 +9,7 @@ const int QK = 32;
 // usage:
 //  ./llama-quantize models/llama/ggml-model.bin models/llama/ggml-model-quant.bin type
 //
-int main(int argc, char** argv)
-{
+int main(int argc, char ** argv) {
     ggml_time_init();
 
     if (argc != 4) {
@@ -22,8 +21,8 @@ int main(int argc, char** argv)
 
     // needed to initialize f16 tables
     {
-        struct ggml_init_params params = {0, NULL};
-        struct ggml_context*    ctx    = ggml_init(params);
+        struct ggml_init_params params = { 0, NULL };
+        struct ggml_context * ctx = ggml_init(params);
         ggml_free(ctx);
     }
 
@@ -53,8 +52,8 @@ int main(int argc, char** argv)
         const int64_t t_main_end_us = ggml_time_us();
 
         printf("\n");
-        printf("%s: quantize time = %8.2f ms\n", __func__, t_quantize_us / 1000.0f);
-        printf("%s:    total time = %8.2f ms\n", __func__, (t_main_end_us - t_main_start_us) / 1000.0f);
+        printf("%s: quantize time = %8.2f ms\n", __func__, t_quantize_us/1000.0f);
+        printf("%s:    total time = %8.2f ms\n", __func__, (t_main_end_us - t_main_start_us)/1000.0f);
     }
 
     return 0;
