@@ -10,6 +10,10 @@ ifndef UNAME_M
 UNAME_M := $(shell uname -m)
 endif
 
+ifndef OS
+OS := $(shell uname -o)
+endif
+
 CCV := $(shell $(CC) --version | head -n 1)
 CXXV := $(shell $(CXX) --version | head -n 1)
 
@@ -36,7 +40,9 @@ CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
 LDFLAGS  =
 
 # OS specific
-# TODO: support Windows
+ifeq ($(OS),Windows_NT)
+	LDFLAGS  += -lws2_32
+endif
 ifeq ($(UNAME_S),Linux)
 	CFLAGS   += -pthread
 	CXXFLAGS += -pthread
@@ -212,6 +218,7 @@ $(info I CXX:      $(CXXV))
 $(info )
 
 default: main quantize
+examples: server-demo
 
 #
 # Build library
@@ -227,7 +234,7 @@ utils.o: utils.cpp utils.h
 	$(CXX) $(CXXFLAGS) -c utils.cpp -o utils.o
 
 clean:
-	rm -f *.o main quantize
+	rm -f *.o main quantize server-demo
 
 main: main.cpp ggml.o llama.o utils.o
 	$(CXX) $(CXXFLAGS) main.cpp ggml.o llama.o utils.o -o main $(LDFLAGS)
@@ -235,6 +242,14 @@ main: main.cpp ggml.o llama.o utils.o
 
 quantize: quantize.cpp ggml.o llama.o utils.o
 	$(CXX) $(CXXFLAGS) quantize.cpp ggml.o llama.o utils.o -o quantize $(LDFLAGS)
+
+#
+# Examples
+#
+
+server-demo: examples/server/demo.cpp examples/server/server.cpp examples/server/server.h ggml.o llama.o utils.o
+	$(CXX) $(CXXFLAGS) examples/server/demo.cpp examples/server/server.cpp ggml.o llama.o utils.o -o server-demo $(LDFLAGS)
+	@echo "\x1b[36mrun ./server -h for help\x1b[0m"
 
 #
 # Tests

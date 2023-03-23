@@ -133,7 +133,22 @@ if (LLAMA_ALL_WARNINGS)
             -Wcast-qual
         )
     else()
-        # todo : msvc
+        set(c_flags
+            /W4     # all warnings
+            /wd4201 # nonstandard extension used: nameless struct/union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4996 # 'function': was declared deprecated
+            /wd4244 # conversion from 'type1' to 'type2', possible loss of data
+            /wd4267 # conversion from 'size_t' to 'type', possible loss of data
+        )
+        set(cxx_flags
+            /W4     # all warnings
+            /wd4201 # nonstandard extension used: nameless struct/union
+            /wd4324 # structure was padded due to alignment specifier
+            /wd4996 # 'function': was declared deprecated
+            /wd4244 # conversion from 'type1' to 'type2', possible loss of data
+            /wd4267 # conversion from 'size_t' to 'type', possible loss of data
+        )
     endif()
 
     add_compile_options(
@@ -254,6 +269,6 @@ if (LLAMA_BUILD_TESTS AND NOT CMAKE_JS_VERSION)
     add_subdirectory(tests)
 endif ()
 
-#if (LLAMA_BUILD_EXAMPLES)
-#    add_subdirectory(examples)
-#endif()
+if (LLAMA_BUILD_EXAMPLES)
+   add_subdirectory(examples)
+endif()
