@@ -35,10 +35,11 @@ endif
 #
 
 # keep standard at C11 and C++11
-CFLAGS   = -I. -O3 -DNDEBUG -std=c11   -fPIC
+CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
 LDFLAGS  =
 
+# OS specific
 ifeq ($(OS),Windows_NT)
 	LDFLAGS  += -lws2_32
 endif
@@ -223,7 +224,7 @@ examples: server-demo
 #
 
 ggml.o: ggml.c ggml.h
-	$(CC) $(CFLAGS) -c ggml.c -o ggml.o
+	$(CC)  $(CFLAGS)   -c ggml.c -o ggml.o
 
 llama.o: llama.cpp llama.h
 	$(CXX) $(CXXFLAGS) -c llama.cpp -o llama.o
@@ -237,8 +238,6 @@ clean:
 main: main.cpp ggml.o llama.o utils.o
 	$(CXX) $(CXXFLAGS) main.cpp ggml.o llama.o utils.o -o main $(LDFLAGS)
 	@echo "\x1b[36mrun ./main -h for help\x1b[0m"
-
-
 
 quantize: quantize.cpp ggml.o llama.o utils.o
 	$(CXX) $(CXXFLAGS) quantize.cpp ggml.o llama.o utils.o -o quantize $(LDFLAGS)
