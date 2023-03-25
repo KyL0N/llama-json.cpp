@@ -18,10 +18,11 @@ int socketInit()
 {
 #if defined(_WIN32)
     WSADATA wsaData;
-    return WSAStartup(MAKEWORD(2, 2), &wsaData);
-#else
-    return 0;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        return -1;
+    }
 #endif
+    return 0;
 }
 
 void socketCleanup()
@@ -33,10 +34,12 @@ void socketCleanup()
 
 void handle_connection(SOCKET socket)
 {
-    char buffer[1024];
+    // Receive data from the client
+    const int bufferSize = 1024;
+    char buffer[bufferSize];
     int  recvResult;
+    bool connectionClosed = false;
     do {
-        // Receive data from the client
         recvResult = recv(socket, buffer, sizeof(buffer), 0);
         if (recvResult == SOCKET_ERROR) {
             fprintf(stderr, "recv message failed\n");
@@ -44,14 +47,34 @@ void handle_connection(SOCKET socket)
             return;
         }
 
-        std::string message(buffer, recvResult);
-
         // Push the message onto the queue
+        std::string message(buffer, recvResult);
         messageQueue.push(message);
+
+        if (recvResult == 0) {
+            // Connection closed
+            connectionClosed = true;
+            break;
+        }
 
     } while (recvResult > 0);
 
+    if (connectionClosed) {
+        socketClose(socket);
+        return;
+    }
+
     socketClose(socket);
+}
+
+void sendResponse(SOCKET clientSocket, const std::string& response) {
+    // Send the response back to the client
+    int sendResult = send(clientSocket, response.c_str(), response.length(), 0);
+    if (sendResult == SOCKET_ERROR) {
+        fprintf(stderr, "send message failed\n");
+        socketClose(clientSocket);
+        return;
+    }
 }
 
 std::vector<std::thread> init_server()
@@ -95,52 +118,53 @@ std::vector<std::thread> init_server()
     printf("Waiting for client to connect 127.0.0.1:%d\n", ntohs(localAddr.sin_port));
     // block until a client connects
     clientSocket = accept(listenSocket, nullptr, nullptr);
-    std::thread acceptThread([&]() {
-        if (clientSocket == INVALID_SOCKET) {
-            fprintf(stderr, "accept socket failed\n");
-            socketClose(listenSocket);
-            return;
-        }
+    if (clientSocket == INVALID_SOCKET) {
+        fprintf(stderr, "accept socket failed\n");
+        socketClose(listenSocket);
+        return {};
+    }
 
-        // Handle the connection in a separate thread
-        std::thread connectionThread(handle_connection, clientSocket);
-        connectionThread.detach();
-    });
+    // Handle the connection in a separate thread
+    std::thread connectionThread(handle_connection, clientSocket);
+    connectionThread.detach();
 
     std::thread messageThread([&]() {
         while (true) {
             // Wait for a response from the main thread
             std::string response;
-            // std::string responseStr = "";
-
             while (!responseQueue.tryPop(response)) {
+
+                // Make sure we don't busy-wait too much
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+                // Check if the connection thread has exited
+                if (!__builtin_expect(connectionThread.joinable(), true)) {
+                    return;
+                }
             }
 
-            // to string
-            // for (int i = 0; i < response.size(); i++) {
-            //     responseStr += std::to_string(response[i]) + ",";
-            // }
-            // Send the response back to the client
-            int sendResult = send(clientSocket, response.c_str(), response.length(), 0);
-            if (sendResult == SOCKET_ERROR) {
-                fprintf(stderr, "send message failed\n");
-                socketClose(clientSocket);
-                return;
-            }
+            // Send the response to the client
+            sendResponse(clientSocket, response);
         }
     });
 
+
+
     std::vector<std::thread> threads;
-    threads.push_back(std::move(acceptThread));
+    threads.push_back(std::move(connectionThread));
     threads.push_back(std::move(messageThread));
-    return threads;
+    return std::move(threads);
 }
 
 void deinit_server(std::vector<std::thread>& threads)
 {
-    socketClose(listenSocket);
+    if (listenSocket != INVALID_SOCKET) {
+        socketClose(listenSocket);
+        listenSocket = INVALID_SOCKET;
+    }
     for (auto& thread : threads) {
-        thread.join();
+        if (thread.joinable()) {
+            thread.join();
+        }
     }
 }

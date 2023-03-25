@@ -35,7 +35,7 @@ template <typename T> class ThreadSafeQueue {
         if (queue_.empty()) {
             return false;
         }
-        value = queue_.front();
+        value = std::move(queue_.front());
         queue_.pop();
         return true;
     }
